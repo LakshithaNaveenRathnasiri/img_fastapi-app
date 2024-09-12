@@ -7,3 +7,8 @@ joblib
 tensorflow
 Pillow
 python-multipart
+pydantic
+aiohttp
+python-dotenv
+pytest
+loguru
