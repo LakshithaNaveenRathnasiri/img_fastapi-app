@@ -6,6 +6,9 @@ import numpy as np
 import os
 import gdown
 
+# Disable GPU usage
+tf.config.set_visible_devices([], 'GPU')
+
 # Initialize FastAPI app
 app = FastAPI()
 
@@ -68,17 +71,18 @@ def predict_image(image_array: np.ndarray):
         ]
     }
 
-# Define the endpoint for image upload and prediction
+# Define the endpoint
 @app.post("/predict/")
 async def predict(file: UploadFile = File(...)):
-    # Read the image file
-    image_data = await file.read()
-    image = Image.open(io.BytesIO(image_data))
+    try:
+        # Read and process the image
+        image = Image.open(io.BytesIO(await file.read())).convert("RGB")
+        image_array = preprocess_image(image)
+        prediction_details = predict_image(image_array)
+        return prediction_details
+    except Exception as e:
+        return {"error": str(e)}
 
-    # Preprocess the image
-    image_array = preprocess_image(image)
-
-    # Make a prediction
-    prediction = predict_image(image_array)
-
-    return prediction
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
