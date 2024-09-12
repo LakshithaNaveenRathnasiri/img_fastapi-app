@@ -5,3 +5,4 @@ pandas
 gdown
 joblib
 tensorflow
+Pillow
